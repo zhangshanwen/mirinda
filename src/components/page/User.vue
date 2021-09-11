@@ -63,32 +63,32 @@
             </el-row>
         </div>
         <el-dialog
-                :title="isEdit? $t('i18n.edit'):$t('i18n.new')"
+                :title="is_edit? $t('i18n.edit'):$t('i18n.new')"
                 :visible.sync="save_visible"
                 width="30%"
                 center>
             <el-form :model="form" :rules="rules">
-                <el-form-item :label="$t('field.id')" v-if="isEdit">
+                <el-form-item :label="$t('field.id')" v-if="is_edit">
                     <el-input disabled v-model="form.id"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('field.username')" prop="username">
                     <el-input v-model="form.username"></el-input>
                 </el-form-item>
-                <el-form-item v-if="!isEdit" :label="$t('field.password')" prop="password">
+                <el-form-item v-if="!is_edit" :label="$t('field.password')" prop="password">
                     <el-input v-model="form.password"></el-input>
                 </el-form-item>
 
             </el-form>
 
             <el-button @click="save_visible = false">{{$t('i18n.cancel')}}</el-button>
-            <el-button v-if="isEdit" type="primary" :disabled="isEditDisable" @click="editData()">{{$t('i18n.confirm')}}
+            <el-button v-if="is_edit" type="primary" :disabled="is_edit_disable" @click="editData()">{{$t('i18n.confirm')}}
             </el-button>
-            <el-button v-else type="primary" :disabled="isNewDisable" @click="newData()">{{$t('i18n.confirm')}}
+            <el-button v-else type="primary" :disabled="is_new_disable" @click="newData()">{{$t('i18n.confirm')}}
             </el-button>
         </el-dialog>
-        <el-dialog :title="$t('i18n.delete')" :visible.sync="delVisible" width="20%">
+        <el-dialog :title="$t('i18n.delete')" :visible.sync="del_visible" width="20%">
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="delVisible = false">{{$t('i18n.cancel')}}</el-button>
+                <el-button type="primary" @click="del_visible = false">{{$t('i18n.cancel')}}</el-button>
                 <el-button type="primary" @click="deleteOne()">{{$t('i18n.confirm')}}</el-button>
             </div>
         </el-dialog>
@@ -125,9 +125,9 @@
                 },
                 loading: false,
                 save_visible: false,
-                delVisible: false,
+                del_visible: false,
                 reset_password_visible: false,
-                isEdit: false,
+                is_edit: false,
                 form: {
                     id: '',
                     username: '',
@@ -159,7 +159,7 @@
                     password: ''
                 };
                 this.save_visible = true;
-                this.isEdit = false;
+                this.is_edit = false;
             },
             clickEditData(row) {
                 this.form = {
@@ -168,13 +168,13 @@
                     row: row
                 };
                 this.save_visible = true;
-                this.isEdit = true;
+                this.is_edit = true;
             },
             clickDeleteData(operate_id) {
                 this.form = {
                     id: operate_id
                 };
-                this.delVisible = true;
+                this.del_visible = true;
             },
             clickResetPassword(operate_id) {
                 this.form = {
@@ -198,7 +198,7 @@
             },
             deleteOne() {
                 deleteUser(this.form).then((res) => {
-                        this.delVisible = false;
+                        this.del_visible = false;
                         this.loadData();
                     }
                 );
@@ -225,10 +225,10 @@
             this.loadData();
         },
         computed: {
-            isNewDisable() {
+            is_new_disable() {
                 return this.form.username === '' || this.form.password === '';
             },
-            isEditDisable() {
+            is_edit_disable() {
                 return this.form.username === '';
             }
         }

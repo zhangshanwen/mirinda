@@ -11,7 +11,7 @@ import './assets/css/icon.css';
 import './components/common/directives';
 import 'babel-polyfill';
 import { getToken } from './utils/auth';
-import { set_permissions, get_permissions, has_permission } from './utils/permission';
+import { setPermissions, get_permissions, has_permission } from './utils/permission';
 
 
 Vue.config.productionTip = false;
@@ -28,6 +28,7 @@ const i18n = new VueI18n({
 const staticRoute = ['/', '/home', '/login', '/403', '/404'];
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
+    console.log(to, from);
     document.title = `${to.meta.title} | manage-system`;
     if (to.path === '/login') {
         next();
@@ -54,12 +55,12 @@ let app = new Vue({
     store,
     render: h => h(App),
     methods: {
-        async setPermissions() {
-            set_permissions();
-        }, async getPermissions() {
-            get_permissions();
-        }, async hasPermission(key) {
-            has_permission(key);
+        setPermissions() {
+            return setPermissions();
+        }, getPermissions() {
+            return get_permissions();
+        }, hasPermission(key) {
+            return has_permission(key);
         }
     }
 }).$mount('#app');

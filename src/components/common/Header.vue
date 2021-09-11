@@ -45,7 +45,6 @@
 
 </template>
 <script>
-    import { logout } from '../../api/login';
     import { changePassword } from '../../api/admin';
     import bus from '../common/bus';
     import { removeToken } from '../../utils/auth';
@@ -76,11 +75,9 @@
             // 用户名下拉菜单选择事件
             async handleCommand(command) {
                 if (command === 'logout') {
-                    await logout().finally(() => {
-                        removeToken();
-                        localStorage.removeItem('ms_username');
-                        this.$router.push('/login');
-                    });
+                    removeToken();
+                    localStorage.removeItem('ms_username');
+                    await this.$router.push('/login');
 
                 } else if (command === 'change_password') {
                     this.changePasswordVisible = true;

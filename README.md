@@ -7,7 +7,11 @@
         - js文件使用驼峰(首字母小写,例如:getDate)
         - vue使用驼峰(首字母大写写,例如:User)
 ```
+正式环境运行
 cp .env.example .env.production
+本地运行
+cp .env.example .env.development
+
 运行:
 npm install 
 npm run serve
@@ -51,3 +55,7 @@ npm run build
 └── vue.config.js
 
 ```
+- 权限页面
+    - 设计
+        - 三层设计,上层为侧边栏目录为两层接口，最下层为按钮级
+        - 权限采用唯一key 标识, 统一通过has_permission 方法获取是否有权限

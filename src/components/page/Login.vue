@@ -30,6 +30,8 @@
 <script>
     import { login } from '../../api/login';
     import { setToken } from '../../utils/auth';
+    import key2Path from '../../api/route';
+    import { savePermissionMenus, setPermissions } from '../../utils/permission';
 
     export default {
         name: 'Login',
@@ -42,20 +44,42 @@
                 rules: {
                     mobile: [{ required: true, message: this.$t('i18n.pls_input_username_mobile'), trigger: 'blur' }],
                     password: [{ required: true, message: this.$t('i18n.pls_input_password'), trigger: 'blur' }]
-                }
+                },
+                keys_permission: [],
+                menus: []
             };
         },
         methods: {
             submitForm() {
                 this.$refs.login.validate(valid => {
                     if (valid) {
-                        login(this.param.mobile, this.param.password).then(async res => {
+                        login(this.param.mobile, this.param.password).then(res => {
                             localStorage.setItem('ms_username', res.data.username);
                             setToken(res.data.authorization);
-                            await this.$router.push('/users');
+                            this.menus = [];
+                            this.setPath(res.data.list, this.menus);
+                            savePermissionMenus(this.menus);
+                            setPermissions(res.data.keys);
+                            this.$router.push('/user');
                         }).catch(() => {
                         });
                     }
+                });
+            },
+            setPath(children, items) {
+                children.forEach(child => {
+                    this.keys_permission = this.keys_permission.concat(child.key);
+                    const path = key2Path[child.key];
+                    let item = {
+                        icon: child.icon,
+                        id: child.id,
+                        index: key2Path[child.key] ? key2Path[child.key] : child.id.toString(),
+                        title: child.name,
+                        path: path,
+                        children: []
+                    };
+                    items.push(item);
+                    this.setPath(child.children, item.children);
                 });
             }
         },

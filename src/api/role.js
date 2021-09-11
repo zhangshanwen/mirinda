@@ -2,9 +2,7 @@ import request from '../utils/request';
 
 
 export function getRoles(form) {
-    return request({
-        method: 'get',
-        url: `/v1/roles`,
+    return request.get(`/v1/roles`, {
         params: {
             page: form.page_index,
             page_size: form.page_size,
@@ -15,30 +13,19 @@ export function getRoles(form) {
 }
 
 export function createRole(form) {
-    return request({
-        method: 'post',
-        url: `/v1/roles`,
-        data: {
-            name: form.name
-        }
+    return request.post(`/v1/roles`, {
+        name: form.name
     });
 }
 
 export function editRole(form) {
-    return request({
-        method: 'put',
-        url: `/v1/roles/${form.id}`,
-        data: {
-            name: form.name
-        }
+    return request.put(`/v1/roles/${form.id}`, {
+        name: form.name
     });
 }
 
 export function deleteRole(form) {
-    return request({
-        method: 'delete',
-        url: `/v1/roles/${form.id}`
-    });
+    return request.delete(`/v1/roles/${form.id}`)
 }
 
 

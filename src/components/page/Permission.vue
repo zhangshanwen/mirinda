@@ -2,7 +2,9 @@
     <div class="contain">
         <template>
             <div>
-                <el-button type="success" class="new" @click="addPermission()">{{$t('i18n.new')}}</el-button>
+                <el-button type="success" v-if="new_btn_show" class="new"
+                           @click="addPermission()">{{$t('i18n.new')}}
+                </el-button>
             </div>
         </template>
 
@@ -13,6 +15,7 @@
                 <div style="float: right;">
                     <el-link
                             :underline="false"
+                            v-if="new_btn_show"
                             @click="addPermission(group)"
                             type="success"
                             icon="el-icon-plus"
@@ -20,6 +23,7 @@
                     </el-link>&nbsp;&nbsp;
                     <el-link
                             :underline="false"
+                            v-if="edit_btn_show"
                             type="text"
                             icon="el-icon-edit"
                             @click="editPermission(group)"
@@ -27,6 +31,7 @@
                     </el-link>&nbsp;&nbsp;
                     <el-link
                             :underline="false"
+                            v-if="del_btn_show"
                             type="text"
                             icon="el-icon-delete"
                             style="color:#F56C6C"
@@ -42,6 +47,7 @@
                     <div style="float: right;">
                         <el-link
                                 :underline="false"
+                                v-if="new_btn_show"
                                 @click="addPermission(item)"
                                 type="success"
                                 icon="el-icon-plus"
@@ -49,6 +55,7 @@
                         </el-link>&nbsp;&nbsp;
                         <el-link
                                 :underline="false"
+                                v-if="edit_btn_show"
                                 type="text"
                                 icon="el-icon-edit"
                                 @click="editPermission(item)"
@@ -56,6 +63,7 @@
                         </el-link>&nbsp;&nbsp;
                         <el-link
                                 :underline="false"
+                                v-if="del_btn_show"
                                 type="text"
                                 icon="el-icon-delete"
                                 style="color:#F56C6C"
@@ -69,8 +77,8 @@
                             class="sub_permission"
                             v-for="sub_item in item.children"
                             :key="sub_item.id"
-                            closable
-                            @click="editPermission(sub_item)"
+                            :closable="del_btn_show"
+                            @click="edit_btn_show?editPermission(sub_item):null"
                             @close="disablePermission(sub_item)"
                     >{{sub_item.name}}
                     </el-tag>
@@ -126,7 +134,7 @@
                 </el-form-item>
             </el-form>
             <template #footer class="dialog-footer">
-                <el-button @click="is_show_setting_permission_dialog = false">{{$t('i18n.delete')}}</el-button>
+                <el-button @click="is_show_setting_permission_dialog = false">{{$t('i18n.cancel')}}</el-button>
 
                 <el-button type="primary" @click="saveData" :loading="submit_loading">{{$t('i18n.confirm')}}</el-button>
             </template>
@@ -188,9 +196,12 @@
                 if (data) {
                     this.permission.parent_id = data.id;
                     this.permission.id = null;
+                    this.permission.route_ids = [];
                     this.permission.key = `${data.id}_${data.children.length + 1}_${+new Date()}`;
                 } else {
                     this.permission.parent_id = 0;
+                    this.permission.id = null;
+                    this.permission.route_ids = [];
                     this.permission.key = `${0}_${0}_${+new Date()}`;
                 }
                 this.is_show_setting_permission_dialog = true;
@@ -259,7 +270,18 @@
                     return this.$t('i18n.edit_permission');
                 }
                 return this.$t('i18n.add_permission');
+            },
+            new_btn_show() {
+                return this.$root.hasPermission('22_1_1631171034438');
+            },
+            edit_btn_show() {
+                return this.$root.hasPermission('22_3_1631263050215');
+            },
+            del_btn_show() {
+                return this.$root.hasPermission('22_2_1631189149693');
+
             }
+
         }
     };
 </script>

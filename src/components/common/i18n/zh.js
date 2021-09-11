@@ -20,10 +20,13 @@ const zh = {
         'path': '路径',
         'permission': '权限',
         'key': 'key',
-        'icon': '图标'
+        'icon': '图标',
+        'role': '角色'
 
     },
     title: {
+        '403': '403',
+        '404': '404',
         'user': '用户列表',
         'admin': '管理员列表',
         'login': '登录',
@@ -34,9 +37,12 @@ const zh = {
     },
     i18n: {
         'login': '登录',
+        'empty': '空',
+        'nothing': '无',
         'new': '新增',
         'add': '添加',
         'edit': '编辑',
+        'change': '变更',
         'operate': '操作',
         'prompt': '提示',
         'delete': '删除',
@@ -68,6 +74,9 @@ const zh = {
         'pls_input_password': '请输入密码',
         'logout': '登出',
         'change_password': '修改密码',
+        'change_role': '变更角色',
+        'change_permission': '变更权限',
+        'role': '角色',
         'all': '全部',
         'keyword': '关键字',
         'closeOther': '关闭其他',

@@ -3,7 +3,7 @@
         <ul>
             <li class="tags-li" v-for="(item,index) in tagsList" :class="{'active': isActive(item.path)}" :key="index">
                 <router-link :to="item.path" class="tags-li-title">
-                    {{$t("title."+item.title)}}
+                    {{$t('title.'+item.title)}}
                 </router-link>
                 <span class="tags-li-icon" @click="closeTags(index)"><i class="el-icon-close"></i></span>
             </li>
@@ -29,7 +29,7 @@
         data() {
             return {
                 tagsList: []
-            }
+            };
         },
         methods: {
             isActive(path) {
@@ -60,7 +60,7 @@
             setTags(route) {
                 const isExist = this.tagsList.some(item => {
                     return item.path === route.fullPath;
-                })
+                });
                 if (!isExist) {
                     if (this.tagsList.length >= 8) {
                         this.tagsList.shift();
@@ -69,7 +69,7 @@
                         title: route.meta.title,
                         path: route.fullPath,
                         name: route.matched[1].components.default.name
-                    })
+                    });
                 }
                 bus.$emit('tags', this.tagsList);
             },
@@ -104,9 +104,9 @@
                         break;
                     }
                 }
-            })
+            });
         }
-    }
+    };
 
 </script>
 

@@ -17,6 +17,8 @@
 <script>
     import bus from '../common/bus';
     import treeMenu from './TreeMenu';
+    import key2Path from '../../api/route';
+    import { getPermissionMenus } from '../../utils/permission';
 
     export default {
         components: { treeMenu },
@@ -24,40 +26,44 @@
         data() {
             return {
                 collapse: false,
-                items: [
-                    {
-                        icon: 'el-icon-user',
-                        index: '/user',
-                        title: 'user'
-                    },
-                    {
-                        icon: 'el-icon-s-tools',
-                        index: '/permission',
-                        title: 'permission'
-                    },
-                    {
-                        icon: 'el-icon-s-tools',
-                        index: '/role',
-                        title: 'role'
-                    },
-                    {
-                        icon: 'el-icon-s-tools',
-                        index: '/route',
-                        title: 'route'
-                    },
-                    {
-                        icon: 'el-icon-s-tools',
-                        index: '/admin',
-                        title: 'admin'
-                    }
+                // items: [
+                // {
+                //     icon: 'el-icon-user',
+                //     index: '/user',
+                //     title: 'user'
+                // },
+                // {
+                //     icon: 'el-icon-s-tools',
+                //     index: '/permission',
+                //     title: 'permission'
+                // },
+                // {
+                //     icon: 'el-icon-s-tools',
+                //     index: '/role',
+                //     title: 'role'
+                // },
+                // {
+                //     icon: 'el-icon-s-tools',
+                //     index: '/route',
+                //     title: 'route'
+                // },
+                // {
+                //     icon: 'el-icon-s-tools',
+                //     index: '/admin',
+                //     title: 'admin'
+                // }
 
-                ]
+                // ]
             };
 
         },
+        method: {},
         computed: {
             onRoutes() {
                 this.$route.path.replace('/', '');
+            },
+            items() {
+                return getPermissionMenus();
             }
         },
         created() {

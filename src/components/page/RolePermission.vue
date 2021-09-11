@@ -42,10 +42,10 @@
     import lodash from 'lodash';
 
     export default {
-        name: 'SetRolePermission',
+        name: 'RolePermission',
+        props: ['role_permissions'],
         data() {
             return {
-                role_permissions: [],
                 permission_ids: new Set(),
                 old_permission_ids: new Set(),
                 permission_obj: {},
@@ -55,13 +55,8 @@
         },
         methods: {
             loadData() {
-                getRolePermissions(this.$route.params.id).then(res => {
-                    this.role_permissions = res.data.list;
-                    this.setPermissionIds(this.role_permissions);
-                    this.old_permission_ids = lodash.clone(this.permission_ids);
-                }).catch(() => {
-
-                });
+                this.setPermissionIds(this.role_permissions);
+                this.old_permission_ids = lodash.clone(this.permission_ids);
             },
 
             clickSaveData() {
@@ -69,7 +64,7 @@
                     type: 'warning',
                     beforeClose: (action, instance, done) => {
                         if (action === 'confirm') {
-                            editRolePermissions(this.$route.params.id, this.permission_ids).then(res => {
+                            editRolePermissions(this.role_id, this.permission_ids).then(res => {
                                 this.$message.success(this.$t('i18n.save_success'));
                                 this.save_disable = true;
                                 this.loadData();
@@ -141,9 +136,10 @@
                     this.checkedChildren(item, true);
                 } else {
                     this.permission_ids.delete(item.id);
-                    // 如果当前元素被取消，其子元素全部取消,如果兄弟全军覆没，父节点也取消，依此往上
-                    this.checkedBrother(item, false);
+                    // 如果当前元素被取消，其子元素全部取消,
                     this.checkedChildren(item, false);
+                    ////如果兄弟全军覆没，父节点也取消，依此往上
+                    // this.checkedBrother(item, false);
 
                 }
                 this.setSaveDisable();
@@ -155,8 +151,11 @@
                 this.save_disable = (difference1.size === 0) && (difference2.size === 0);
             }
         },
-        created() {
-            this.loadData();
+        watch: {
+            role_permissions() {
+                this.loadData();
+
+            }
         }
     };
 </script>

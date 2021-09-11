@@ -2,7 +2,7 @@
     <div>
         <div class="contain">
             <el-button type="primary" @click="loadData()">{{$t('i18n.search')}}</el-button>
-            <el-button type="primary" @click="clickNewData()">{{$t('i18n.new')}}</el-button>
+            <el-button type="primary" v-if="new_btn_show" @click="clickNewData()">{{$t('i18n.new')}}</el-button>
             <el-divider></el-divider>
             <el-table
                     v-loading="loading"
@@ -30,12 +30,21 @@
                                  :formatter="formatterTime"
                                  align="center">
                 </el-table-column>
-                <el-table-column :label="$t('i18n.operate')"
-                                 align="center">
+                <el-table-column :label="$t('i18n.permission')"
+                                 align="center" v-if="change_permission_btn_show">
                     <template slot-scope="scope">
-                        <el-button type="text" @click=clickEditData(scope.row)>{{$t('i18n.edit')}}</el-button>
-                        <el-button type="text" @click=clickPermission(scope.row)>{{$t('i18n.permission')}}</el-button>
-                        <el-button type="text" @click="clickDeleteData(scope.row.id)">{{$t('i18n.delete')}}</el-button>
+                        <el-button type="text" @click=clickPermission(scope.row)>{{$t('i18n.change')}}</el-button>
+                    </template>
+                </el-table-column>
+                <el-table-column :label="$t('i18n.operate')"
+                                 align="center" v-if="edit_btn_show|| del_btn_show">
+                    <template slot-scope="scope">
+                        <el-button type="text" v-if="edit_btn_show" @click=clickEditData(scope.row)>
+                            {{$t('i18n.edit')}}
+                        </el-button>
+                        <el-button type="text" v-if="del_btn_show" @click="clickDeleteData(scope.row.id)">
+                            {{$t('i18n.delete')}}
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -57,12 +66,12 @@
             </el-row>
         </div>
         <el-dialog
-                :title="isEdit? $t('i18n.edit'):$t('i18n.new')"
+                :title="is_edit? $t('i18n.edit'):$t('i18n.new')"
                 :visible.sync="save_visible"
                 width="30%"
                 center>
             <el-form :model="form" :rules="rules">
-                <el-form-item :label="$t('field.id')" v-if="isEdit">
+                <el-form-item :label="$t('field.id')" v-if="is_edit">
                     <el-input disabled v-model="form.id"></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('field.name')" prop="name">
@@ -72,18 +81,26 @@
             </el-form>
 
             <el-button @click="save_visible = false">{{$t('i18n.cancel')}}</el-button>
-            <el-button v-if="isEdit" type="primary" :disabled="isEditDisable" @click="editData()">{{$t('i18n.confirm')}}
+            <el-button v-if="is_edit" type="primary" :disabled="is_edit_disable" @click="editData()">
+                {{$t('i18n.confirm')}}
             </el-button>
-            <el-button v-else type="primary" :disabled="isNewDisable" @click="newData()">{{$t('i18n.confirm')}}
+            <el-button v-else type="primary" :disabled="is_new_disable" @click="newData()">{{$t('i18n.confirm')}}
             </el-button>
         </el-dialog>
-        <el-dialog :title="$t('i18n.delete')" :visible.sync="delVisible" width="20%">
+        <el-dialog :title="$t('i18n.delete')" :visible.sync="del_visible" width="20%">
             <div slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="delVisible = false">{{$t('i18n.cancel')}}</el-button>
+                <el-button type="primary" @click="del_visible = false">{{$t('i18n.cancel')}}</el-button>
                 <el-button type="primary" @click="deleteOne()">{{$t('i18n.confirm')}}</el-button>
             </div>
         </el-dialog>
-
+        <el-drawer
+                :title="$t('i18n.change_permission')"
+                :visible.sync="change_permission_visible"
+                direction="rtl"
+                size="60%"
+        >
+            <role-permission :role_permissions="role_permissions"></role-permission>
+        </el-drawer>
     </div>
 
 
@@ -92,10 +109,13 @@
 <script>
     import { getRoles, createRole, editRole, deleteRole } from '../../api/role';
     import Formatter from '../public/Formatter';
+    import RolePermission from './RolePermission';
+    import { getRolePermissions } from '../../api/rolePermission';
 
     export default {
         extends: Formatter,
         name: 'Role',
+        components: { RolePermission },
         data() {
             return {
                 pagination: {
@@ -109,9 +129,10 @@
                 },
                 loading: false,
                 save_visible: false,
-                delVisible: false,
+                del_visible: false,
                 reset_password_visible: false,
-                isEdit: false,
+                change_permission_visible: false,
+                is_edit: false,
                 form: {
                     id: '',
                     username: '',
@@ -120,7 +141,8 @@
                 table_data: [],
                 rules: {
                     name: [{ required: true, message: this.$t('i18n.pls_input_name'), trigger: 'blur' }]
-                }
+                },
+                role_permissions: []
             };
         },
         methods: {
@@ -143,7 +165,7 @@
                     name: ''
                 };
                 this.save_visible = true;
-                this.isEdit = false;
+                this.is_edit = false;
             },
             clickEditData(row) {
                 this.form = {
@@ -152,16 +174,23 @@
                     row: row
                 };
                 this.save_visible = true;
-                this.isEdit = true;
+                this.is_edit = true;
             },
             clickDeleteData(operate_id) {
                 this.form = {
                     id: operate_id
                 };
-                this.delVisible = true;
+                this.del_visible = true;
             },
             clickPermission(row) {
-                this.$router.push(`role/permission/${row.id}`);
+                getRolePermissions(row.id).then(res => {
+                    this.role_permissions = res.data.list;
+                    this.change_permission_visible = true;
+
+                }).catch(() => {
+
+                });
+
             },
             newData() {
                 createRole(this.form).then((res) => {
@@ -179,7 +208,7 @@
             },
             deleteOne() {
                 deleteRole(this.form).then((res) => {
-                        this.delVisible = false;
+                        this.del_visible = false;
                         this.loadData();
                     }
                 );
@@ -199,11 +228,23 @@
             this.loadData();
         },
         computed: {
-            isNewDisable() {
+            is_new_disable() {
                 return this.form.name === '';
             },
-            isEditDisable() {
+            is_edit_disable() {
                 return this.form.name === '';
+            },
+            new_btn_show() {
+                return this.$root.hasPermission('31_1_1631277588024');
+            },
+            edit_btn_show() {
+                return this.$root.hasPermission('31_2_1631277662260');
+            },
+            del_btn_show() {
+                return this.$root.hasPermission('31_3_1631277678919');
+            },
+            change_permission_btn_show() {
+                return this.$root.hasPermission('30_5_1631276967393');
             }
         }
     };
